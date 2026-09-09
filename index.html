@@ -1,0 +1,1127 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+
+    <meta
+        name="viewport"
+        content="width=device-width, initial-scale=1.0"
+    >
+
+    <title>PitchBoard - Live Match Dashboard</title>
+
+    <link rel="stylesheet" href="styles.css">
+
+    <script src="app.js" defer></script>
+</head>
+
+<body>
+
+<div class="dashboard">
+
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
+
+    <aside class="sidebar" id="sidebar">
+
+        <div class="sidebar-inner">
+
+            <div class="brand">
+                <div class="brand-title">
+                    PitchBoard
+                </div>
+
+                <div class="brand-subtitle">
+                    Track up to four live football matches on one screen
+                </div>
+            </div>
+
+
+            <!-- Layout -->
+
+            <div class="sidebar-section">
+
+                <div class="sidebar-section-title">
+                    Layout
+                </div>
+
+                <div class="layout-selector">
+
+                    <button
+                        class="layout-button"
+                        data-layout="1x1"
+                        type="button">
+                        1 × 1
+                    </button>
+
+                    <button
+                        class="layout-button"
+                        data-layout="1x2"
+                        type="button">
+                        1 × 2
+                    </button>
+
+                    <button
+                        class="layout-button active"
+                        data-layout="2x2"
+                        type="button">
+                        2 × 2
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- Matches -->
+
+            <div class="sidebar-section">
+
+                <div class="sidebar-section-title">
+                    Matches
+                </div>
+
+
+                <!-- Match 01 -->
+
+                <div class="sidebar-match">
+
+                    <div class="sidebar-match-header">
+                        <span class="sidebar-match-number">
+                            #01
+                        </span>
+
+                        <span class="sidebar-match-label">
+                            Match 01
+                        </span>
+                    </div>
+
+                    <div class="sidebar-match-controls">
+
+                        <input
+                            id="sidebar-event-1"
+                            class="sidebar-event-input"
+                            type="text"
+                            inputmode="numeric"
+                            value="16938854"
+                            autocomplete="off"
+                            placeholder="Event ID"
+                        >
+
+                        <button
+                            class="sidebar-go-button"
+                            data-sidebar-go="0"
+                            type="button">
+                            GO
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Match 02 -->
+
+                <div class="sidebar-match">
+
+                    <div class="sidebar-match-header">
+                        <span class="sidebar-match-number">
+                            #02
+                        </span>
+
+                        <span class="sidebar-match-label">
+                            Match 02
+                        </span>
+                    </div>
+
+                    <div class="sidebar-match-controls">
+
+                        <input
+                            id="sidebar-event-2"
+                            class="sidebar-event-input"
+                            type="text"
+                            inputmode="numeric"
+                            value="16938848"
+                            autocomplete="off"
+                            placeholder="Event ID"
+                        >
+
+                        <button
+                            class="sidebar-go-button"
+                            data-sidebar-go="1"
+                            type="button">
+                            GO
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Match 03 -->
+
+                <div class="sidebar-match">
+
+                    <div class="sidebar-match-header">
+                        <span class="sidebar-match-number">
+                            #03
+                        </span>
+
+                        <span class="sidebar-match-label">
+                            Match 03
+                        </span>
+                    </div>
+
+                    <div class="sidebar-match-controls">
+
+                        <input
+                            id="sidebar-event-3"
+                            class="sidebar-event-input"
+                            type="text"
+                            inputmode="numeric"
+                            value="16938991"
+                            autocomplete="off"
+                            placeholder="Event ID"
+                        >
+
+                        <button
+                            class="sidebar-go-button"
+                            data-sidebar-go="2"
+                            type="button">
+                            GO
+                        </button>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Match 04 -->
+
+                <div class="sidebar-match">
+
+                    <div class="sidebar-match-header">
+                        <span class="sidebar-match-number">
+                            #04
+                        </span>
+
+                        <span class="sidebar-match-label">
+                            Match 04
+                        </span>
+                    </div>
+
+                    <div class="sidebar-match-controls">
+
+                        <input
+                            id="sidebar-event-4"
+                            class="sidebar-event-input"
+                            type="text"
+                            inputmode="numeric"
+                            value="16938768"
+                            autocomplete="off"
+                            placeholder="Event ID"
+                        >
+
+                        <button
+                            class="sidebar-go-button"
+                            data-sidebar-go="3"
+                            type="button">
+                            GO
+                        </button>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+
+            <div class="sidebar-footer">
+
+                <button
+                    id="hideSidebar"
+                    class="sidebar-hide-button"
+                    type="button">
+
+                    Hide sidebar
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </aside>
+
+
+    <!-- =========================
+         SHOW SIDEBAR BUTTON
+    ========================== -->
+
+    <button
+        id="showSidebar"
+        class="show-sidebar-button"
+        type="button"
+        aria-label="Show sidebar">
+
+        ☰
+
+    </button>
+
+
+    <!-- =========================
+         MAIN CONTENT
+    ========================== -->
+
+    <main class="content">
+
+        <div
+            id="matchGrid"
+            class="match-grid layout-2x2">
+
+
+            <!-- =================================
+                 MATCH 01
+            ================================== -->
+
+            <section
+                class="match"
+                data-index="0">
+
+
+                <!-- Summary -->
+
+                <div class="summary">
+
+                    <div class="team home-team">
+
+                        <img
+                            class="team-logo home-logo"
+                            src=""
+                            alt=""
+                        >
+
+                        <span class="team-name home-name">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="score-area">
+
+                        <div class="score">
+
+                            <span class="home-score">
+                                0
+                            </span>
+
+                            <span class="score-separator">
+                                -
+                            </span>
+
+                            <span class="away-score">
+                                0
+                            </span>
+
+                        </div>
+
+                        <div class="status">
+                            —
+                        </div>
+
+                        <div class="competition">
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="team away-team">
+
+                        <span class="team-name away-name">
+                            —
+                        </span>
+
+                        <img
+                            class="team-logo away-logo"
+                            src=""
+                            alt=""
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <!-- Statistics -->
+
+                <div class="stats">
+
+                    <div class="stat">
+
+                        <span class="stat-label">
+                            Possession
+                        </span>
+
+                        <div class="stat-values">
+
+                            <span class="home-possession">
+                                —
+                            </span>
+
+                            <span class="stat-divider">
+                                :
+                            </span>
+
+                            <span class="away-possession">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat">
+
+                        <span class="stat-label">
+                            Shots
+                        </span>
+
+                        <div class="stat-values">
+
+                            <span class="home-shots">
+                                —
+                            </span>
+
+                            <span class="stat-divider">
+                                :
+                            </span>
+
+                            <span class="away-shots">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat">
+
+                        <span class="stat-label">
+                            Corners
+                        </span>
+
+                        <div class="stat-values">
+
+                            <span class="home-corners">
+                                —
+                            </span>
+
+                            <span class="stat-divider">
+                                :
+                            </span>
+
+                            <span class="away-corners">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Momentum -->
+
+                <div class="momentum-container">
+
+                    <span class="momentum-label">
+                        Momentum
+                    </span>
+
+                    <div class="momentum-bar">
+
+                        <div class="momentum-fill momentum-home"></div>
+
+                        <div class="momentum-fill momentum-away"></div>
+
+                    </div>
+
+                </div>
+
+
+                <!-- Tracker -->
+
+                <div class="tracker-wrapper">
+
+                    <iframe
+                        class="tracker"
+                        src="https://www.sofascore.com/api/v1/event/16938854/live-match-tracker/en/invert-teams/false"
+                        title="Match 01 Live Tracker"
+                        loading="eager"
+                        scrolling="no"
+                        frameborder="0">
+                    </iframe>
+
+
+                    <!-- Incidents overlay -->
+
+                    <div class="incident-ticker">
+
+                        <div class="incident-list">
+
+                            <div class="incident-column-home"></div>
+
+                            <div class="incident-column-away"></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="update-indicator">
+                    —
+                </div>
+
+                <div class="goal-alert">
+                    GOAL!
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================
+                 MATCH 02
+            ================================== -->
+
+            <section
+                class="match"
+                data-index="1">
+
+
+                <div class="summary">
+
+                    <div class="team home-team">
+
+                        <img
+                            class="team-logo home-logo"
+                            src=""
+                            alt=""
+                        >
+
+                        <span class="team-name home-name">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="score-area">
+
+                        <div class="score">
+
+                            <span class="home-score">
+                                0
+                            </span>
+
+                            <span class="score-separator">
+                                -
+                            </span>
+
+                            <span class="away-score">
+                                0
+                            </span>
+
+                        </div>
+
+                        <div class="status">
+                            —
+                        </div>
+
+                        <div class="competition">
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="team away-team">
+
+                        <span class="team-name away-name">
+                            —
+                        </span>
+
+                        <img
+                            class="team-logo away-logo"
+                            src=""
+                            alt=""
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="stats">
+
+                    <div class="stat">
+
+                        <span class="stat-label">
+                            Possession
+                        </span>
+
+                        <div class="stat-values">
+
+                            <span class="home-possession">
+                                —
+                            </span>
+
+                            <span class="stat-divider">
+                                :
+                            </span>
+
+                            <span class="away-possession">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat">
+
+                        <span class="stat-label">
+                            Shots
+                        </span>
+
+                        <div class="stat-values">
+
+                            <span class="home-shots">
+                                —
+                            </span>
+
+                            <span class="stat-divider">
+                                :
+                            </span>
+
+                            <span class="away-shots">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat">
+
+                        <span class="stat-label">
+                            Corners
+                        </span>
+
+                        <div class="stat-values">
+
+                            <span class="home-corners">
+                                —
+                            </span>
+
+                            <span class="stat-divider">
+                                :
+                            </span>
+
+                            <span class="away-corners">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="momentum-container">
+
+                    <span class="momentum-label">
+                        Momentum
+                    </span>
+
+                    <div class="momentum-bar">
+
+                        <div class="momentum-fill momentum-home"></div>
+
+                        <div class="momentum-fill momentum-away"></div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="tracker-wrapper">
+
+                    <iframe
+                        class="tracker"
+                        src="https://www.sofascore.com/api/v1/event/16938848/live-match-tracker/en/invert-teams/false"
+                        title="Match 02 Live Tracker"
+                        loading="eager"
+                        scrolling="no"
+                        frameborder="0">
+                    </iframe>
+
+
+                    <div class="incident-ticker">
+
+                        <div class="incident-list">
+
+                            <div class="incident-column-home"></div>
+
+                            <div class="incident-column-away"></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="update-indicator">
+                    —
+                </div>
+
+                <div class="goal-alert">
+                    GOAL!
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================
+                 MATCH 03
+            ================================== -->
+
+            <section
+                class="match"
+                data-index="2">
+
+
+                <div class="summary">
+
+                    <div class="team home-team">
+
+                        <img
+                            class="team-logo home-logo"
+                            src=""
+                            alt=""
+                        >
+
+                        <span class="team-name home-name">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="score-area">
+
+                        <div class="score">
+
+                            <span class="home-score">
+                                0
+                            </span>
+
+                            <span class="score-separator">
+                                -
+                            </span>
+
+                            <span class="away-score">
+                                0
+                            </span>
+
+                        </div>
+
+                        <div class="status">
+                            —
+                        </div>
+
+                        <div class="competition">
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="team away-team">
+
+                        <span class="team-name away-name">
+                            —
+                        </span>
+
+                        <img
+                            class="team-logo away-logo"
+                            src=""
+                            alt=""
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="stats">
+
+                    <div class="stat">
+
+                        <span class="stat-label">
+                            Possession
+                        </span>
+
+                        <div class="stat-values">
+
+                            <span class="home-possession">
+                                —
+                            </span>
+
+                            <span class="stat-divider">
+                                :
+                            </span>
+
+                            <span class="away-possession">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat">
+
+                        <span class="stat-label">
+                            Shots
+                        </span>
+
+                        <div class="stat-values">
+
+                            <span class="home-shots">
+                                —
+                            </span>
+
+                            <span class="stat-divider">
+                                :
+                            </span>
+
+                            <span class="away-shots">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat">
+
+                        <span class="stat-label">
+                            Corners
+                        </span>
+
+                        <div class="stat-values">
+
+                            <span class="home-corners">
+                                —
+                            </span>
+
+                            <span class="stat-divider">
+                                :
+                            </span>
+
+                            <span class="away-corners">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="momentum-container">
+
+                    <span class="momentum-label">
+                        Momentum
+                    </span>
+
+                    <div class="momentum-bar">
+
+                        <div class="momentum-fill momentum-home"></div>
+
+                        <div class="momentum-fill momentum-away"></div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="tracker-wrapper">
+
+                    <iframe
+                        class="tracker"
+                        src="https://www.sofascore.com/api/v1/event/16938991/live-match-tracker/en/invert-teams/false"
+                        title="Match 03 Live Tracker"
+                        loading="eager"
+                        scrolling="no"
+                        frameborder="0">
+                    </iframe>
+
+
+                    <div class="incident-ticker">
+
+                        <div class="incident-list">
+
+                            <div class="incident-column-home"></div>
+
+                            <div class="incident-column-away"></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="update-indicator">
+                    —
+                </div>
+
+                <div class="goal-alert">
+                    GOAL!
+                </div>
+
+            </section>
+
+
+
+            <!-- =================================
+                 MATCH 04
+            ================================== -->
+
+            <section
+                class="match"
+                data-index="3">
+
+
+                <div class="summary">
+
+                    <div class="team home-team">
+
+                        <img
+                            class="team-logo home-logo"
+                            src=""
+                            alt=""
+                        >
+
+                        <span class="team-name home-name">
+                            —
+                        </span>
+
+                    </div>
+
+
+                    <div class="score-area">
+
+                        <div class="score">
+
+                            <span class="home-score">
+                                0
+                            </span>
+
+                            <span class="score-separator">
+                                -
+                            </span>
+
+                            <span class="away-score">
+                                0
+                            </span>
+
+                        </div>
+
+                        <div class="status">
+                            —
+                        </div>
+
+                        <div class="competition">
+                            —
+                        </div>
+
+                    </div>
+
+
+                    <div class="team away-team">
+
+                        <span class="team-name away-name">
+                            —
+                        </span>
+
+                        <img
+                            class="team-logo away-logo"
+                            src=""
+                            alt=""
+                        >
+
+                    </div>
+
+                </div>
+
+
+                <div class="stats">
+
+                    <div class="stat">
+
+                        <span class="stat-label">
+                            Possession
+                        </span>
+
+                        <div class="stat-values">
+
+                            <span class="home-possession">
+                                —
+                            </span>
+
+                            <span class="stat-divider">
+                                :
+                            </span>
+
+                            <span class="away-possession">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat">
+
+                        <span class="stat-label">
+                            Shots
+                        </span>
+
+                        <div class="stat-values">
+
+                            <span class="home-shots">
+                                —
+                            </span>
+
+                            <span class="stat-divider">
+                                :
+                            </span>
+
+                            <span class="away-shots">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+
+                    <div class="stat">
+
+                        <span class="stat-label">
+                            Corners
+                        </span>
+
+                        <div class="stat-values">
+
+                            <span class="home-corners">
+                                —
+                            </span>
+
+                            <span class="stat-divider">
+                                :
+                            </span>
+
+                            <span class="away-corners">
+                                —
+                            </span>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="momentum-container">
+
+                    <span class="momentum-label">
+                        Momentum
+                    </span>
+
+                    <div class="momentum-bar">
+
+                        <div class="momentum-fill momentum-home"></div>
+
+                        <div class="momentum-fill momentum-away"></div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="tracker-wrapper">
+
+                    <iframe
+                        class="tracker"
+                        src="https://www.sofascore.com/api/v1/event/16938768/live-match-tracker/en/invert-teams/false"
+                        title="Match 04 Live Tracker"
+                        loading="eager"
+                        scrolling="no"
+                        frameborder="0">
+                    </iframe>
+
+
+                    <div class="incident-ticker">
+
+                        <div class="incident-list">
+
+                            <div class="incident-column-home"></div>
+
+                            <div class="incident-column-away"></div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+
+                <div class="update-indicator">
+                    —
+                </div>
+
+                <div class="goal-alert">
+                    GOAL!
+                </div>
+
+            </section>
+
+        </div>
+
+    </main>
+
+</div>
+
+</body>
+</html>

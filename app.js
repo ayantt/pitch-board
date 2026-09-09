@@ -1095,14 +1095,8 @@ async function refreshMatch(
 
     try {
 
-        /*
-         * Route all SofaScore API calls through the server-side
-         * proxy (/api/sofascore) to avoid 403 Forbidden errors in
-         * production. The proxy adds the necessary Referer/Origin
-         * headers that SofaScore requires.
-         */
-        const proxyBase =
-            `/api/sofascore?path=/event/${eventId}`;
+        const base =
+            `https://www.sofascore.com/api/v1/event/${eventId}`;
 
 
         const [
@@ -1111,10 +1105,10 @@ async function refreshMatch(
             statisticsData,
             graphData
         ] = await Promise.all([
-            fetchJson(proxyBase),
-            fetchJson(`${proxyBase}/incidents`),
-            fetchJson(`${proxyBase}/statistics`),
-            fetchJson(`${proxyBase}/graph`)
+            fetchJson(base),
+            fetchJson(`${base}/incidents`),
+            fetchJson(`${base}/statistics`),
+            fetchJson(`${base}/graph`)
         ]);
 
 

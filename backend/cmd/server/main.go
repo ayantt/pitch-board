@@ -21,6 +21,7 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
+
 	baseURL := os.Getenv("SOFASCORE_BASE_URL")
 	if baseURL == "" {
 		baseURL = "https://www.sofascore.com/api/v1"
@@ -52,16 +53,30 @@ func main() {
 		Handler: e,
 	}
 
+	// Start HTTP server.
+	go func() {
+		logger.Info("starting server", slog.String("addr", ":"+port))
+
+		if err := server.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+			logger.Error("server failed", slog.Any("error", err))
+			os.Exit(1)
+		}
+	}()
+
+	// Wait for termination signal.
 	quit := make(chan os.Signal, 1)
 	signal.Notify(quit, syscall.SIGINT, syscall.SIGTERM)
 	<-quit
 
 	logger.Info("shutting down server", slog.String("addr", ":"+port))
+
 	ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
 	defer cancel()
+
 	if err := server.Shutdown(ctx); err != nil {
 		logger.Error("server shutdown error", slog.Any("error", err))
 	}
+
 	logger.Info("server stopped")
 }
 

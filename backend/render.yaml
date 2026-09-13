@@ -1,0 +1,14 @@
+services:
+  api:
+    type: web service
+    name: pitch-board-api
+    env: go
+    plan: starter
+    buildCommand: "cd backend && go build -o server ./cmd/server"
+    startCommand: "./server"
+    envVars:
+      - key: PORT
+        value: "8080"
+      - key: SOFASCORE_BASE_URL
+        value: "https://www.sofascore.com/api/v1"
+    healthCheckPath: /health

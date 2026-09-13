@@ -1096,13 +1096,12 @@ async function refreshMatch(
     try {
 
         /*
-         * Route all SofaScore API calls through the server-side
-         * proxy (/api/sofascore) to avoid 403 Forbidden errors in
-         * production. The proxy adds the necessary Referer/Origin
-         * headers that SofaScore requires.
+         * Route all SofaScore API calls through
+         * api.pitch-board.ayantt.dev instead of the
+         * local server-side proxy.
          */
-        const proxyBase =
-            `/api/sofascore?path=/event/${eventId}`;
+        const eventUrl =
+            `https://api.pitch-board.ayantt.dev/api/event?id=${eventId}`;
 
 
         const [
@@ -1111,10 +1110,10 @@ async function refreshMatch(
             statisticsData,
             graphData
         ] = await Promise.all([
-            fetchJson(proxyBase),
-            fetchJson(`${proxyBase}/incidents`),
-            fetchJson(`${proxyBase}/statistics`),
-            fetchJson(`${proxyBase}/graph`)
+            fetchJson(eventUrl),
+            fetchJson(`https://api.pitch-board.ayantt.dev/api/incidents?id=${eventId}`),
+            fetchJson(`https://api.pitch-board.ayantt.dev/api/statistics?id=${eventId}`),
+            fetchJson(`https://api.pitch-board.ayantt.dev/api/graph?id=${eventId}`)
         ]);
 
 

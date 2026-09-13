@@ -2,9 +2,9 @@ services:
   api:
     type: web service
     name: pitch-board-api
-    env: go
+    env: docker
     plan: starter
-    buildCommand: "cd backend && go build -o server ./cmd/server"
+    dockerfilePath: backend/Dockerfile
     startCommand: "./server"
     envVars:
       - key: PORT

@@ -180,6 +180,20 @@ async function fetchApi(resource, eventId) {
         let code = `http_${response.status}`;
         let message = `HTTP ${response.status}`;
 
+        /*
+         * Diagnostics for the console only. The request id
+         * matches the "requestId" field in the Vercel function
+         * logs. A missing handler header means the response
+         * did not come from the error-aware API (for example
+         * an old deployment, or a platform-level block).
+         */
+
+        const requestId =
+            response.headers.get("X-Request-Id");
+
+        const handler =
+            response.headers.get("X-PitchBoard-Handler");
+
         try {
 
             const body = await response.json();
@@ -197,7 +211,10 @@ async function fetchApi(resource, eventId) {
         return {
             ok: false,
             code,
-            message
+            message,
+            status: response.status,
+            requestId,
+            handler
         };
     }
 
@@ -1285,11 +1302,31 @@ async function refreshMatch(
 
     for (const failure of failures) {
 
+        const result =
+            failure.result;
+
         console.error(
             `Match ${index + 1}: ` +
             `${failure.resource} failed ` +
-            `(${failure.result.code}): ` +
-            failure.result.message
+            `(${result.code}): ` +
+            result.message +
+            (
+                result.status
+                    ? ` [HTTP ${result.status}` +
+                      (
+                          result.requestId
+                              ? `, request ${result.requestId}`
+                              : ""
+                      ) +
+                      (
+                          result.handler
+                              ? ""
+                              : ", NOT from the error-aware API " +
+                                "(old deployment or platform block?)"
+                      ) +
+                      "]"
+                    : ""
+            )
         );
     }
 

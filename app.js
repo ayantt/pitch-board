@@ -2,28 +2,12 @@ const REFRESH_INTERVAL = 10000;
 
 const STORAGE_LAYOUT_KEY = "matchDashboardLayout";
 
-const matchState = [
-    {
-        scoreInitialized: false,
-        homeScore: null,
-        awayScore: null
-    },
-    {
-        scoreInitialized: false,
-        homeScore: null,
-        awayScore: null
-    },
-    {
-        scoreInitialized: false,
-        homeScore: null,
-        awayScore: null
-    },
-    {
-        scoreInitialized: false,
-        homeScore: null,
-        awayScore: null
-    }
-];
+const matchState = [0, 1, 2, 3].map(() => ({
+    eventId: null,
+    scoreInitialized: false,
+    homeScore: null,
+    awayScore: null
+}));
 
 
 /* =========================================================
@@ -140,19 +124,91 @@ function updateTracker(match, eventId) {
    FETCH
 ========================================================= */
 
-async function fetchJson(url) {
+/*
+ * All JSON data comes from our own same-origin
+ * serverless endpoints: /api/{resource}?id={eventId}
+ *
+ * fetchApi never throws. It resolves to either
+ * { ok: true, data } or { ok: false, code, message }
+ * so one failing endpoint cannot break the others.
+ */
 
-    const response = await fetch(url, {
-        cache: "no-store"
-    });
+const EVENT_ID_PATTERN = /^[1-9][0-9]{0,11}$/;
 
-    if (!response.ok) {
-        throw new Error(
-            `HTTP ${response.status}`
+const API_ERROR_MESSAGES = {
+    invalid_event_id: "Invalid event ID",
+    event_not_found: "Event not found",
+    upstream_access_denied: "Data provider denied access",
+    upstream_rate_limited: "Rate limited, retrying",
+    upstream_timeout: "Data provider timed out",
+    upstream_error: "Data provider error",
+    upstream_unreachable: "Data provider unreachable",
+    upstream_invalid_response: "Bad data from provider",
+    network_error: "Network error"
+};
+
+
+function describeApiError(result) {
+
+    return (
+        API_ERROR_MESSAGES[result.code] ||
+        result.message ||
+        "Update failed"
+    );
+}
+
+
+async function fetchApi(resource, eventId) {
+
+    try {
+
+        const response = await fetch(
+            `/api/${resource}?id=${encodeURIComponent(eventId)}`,
+            {
+                cache: "no-store"
+            }
         );
+
+        if (response.ok) {
+
+            return {
+                ok: true,
+                data: await response.json()
+            };
+        }
+
+        let code = `http_${response.status}`;
+        let message = `HTTP ${response.status}`;
+
+        try {
+
+            const body = await response.json();
+
+            if (body && body.error) {
+                code = body.error.code || code;
+                message = body.error.message || message;
+            }
+        }
+
+        catch {
+            /* Non-JSON error body: keep the HTTP status. */
+        }
+
+        return {
+            ok: false,
+            code,
+            message
+        };
     }
 
-    return response.json();
+    catch (error) {
+
+        return {
+            ok: false,
+            code: "network_error",
+            message: error.message || "Network error"
+        };
+    }
 }
 
 
@@ -1080,11 +1136,36 @@ async function refreshMatch(
     }
 
 
+    const indicator =
+        match.querySelector(
+            ".update-indicator"
+        );
+
+
+    /*
+     * Reject malformed IDs before anything uses them,
+     * including the tracker iframe URL.
+     */
+
+    if (!EVENT_ID_PATTERN.test(eventId)) {
+
+        if (indicator) {
+
+            indicator.textContent =
+                "Invalid event ID " +
+                "(numbers only)";
+        }
+
+        return;
+    }
+
+
     /*
      * IMPORTANT:
      *
      * Always update the tracker iframe
-     * before making API requests.
+     * before making API requests. The iframe is
+     * independent of the /api endpoints.
      */
 
     updateTracker(
@@ -1093,75 +1174,165 @@ async function refreshMatch(
     );
 
 
-    try {
+    /*
+     * A different event ID means a different match:
+     * forget the previous score so the switch can
+     * never look like a goal.
+     */
 
-        const base =
-            `https://www.sofascore.com/api/v1/event/${eventId}`;
+    const state =
+        matchState[index];
+
+    if (state.eventId !== eventId) {
+
+        matchState[index] = {
+            eventId,
+            scoreInitialized: false,
+            homeScore: null,
+            awayScore: null
+        };
+    }
 
 
-        const [
-            eventData,
-            incidentsData,
-            statisticsData,
-            graphData
-        ] = await Promise.all([
-            fetchJson(base),
-            fetchJson(`${base}/incidents`),
-            fetchJson(`${base}/statistics`),
-            fetchJson(`${base}/graph`)
-        ]);
+    /*
+     * The four requests are independent. A failure
+     * in one must not hide data from the others.
+     */
 
+    const resources = [
+        "event",
+        "incidents",
+        "statistics",
+        "graph"
+    ];
+
+    const results =
+        await Promise.all(
+            resources.map(
+                resource =>
+                    fetchApi(
+                        resource,
+                        eventId
+                    )
+            )
+        );
+
+
+    /*
+     * Discard the response if the user switched this
+     * slot to another match while we were waiting.
+     */
+
+    if (getEventId(match) !== eventId) {
+        return;
+    }
+
+
+    const [
+        eventResult,
+        incidentsResult,
+        statisticsResult,
+        graphResult
+    ] = results;
+
+
+    if (eventResult.ok) {
 
         await updateEvent(
             match,
-            eventData,
+            eventResult.data,
             index
         );
+    }
 
-
-        await updateStatistics(
-            match,
-            statisticsData
-        );
-
+    if (incidentsResult.ok) {
 
         updateIncidents(
             match,
-            incidentsData
+            incidentsResult.data
         );
+    }
 
+    if (statisticsResult.ok) {
+
+        await updateStatistics(
+            match,
+            statisticsResult.data
+        );
+    }
+
+    if (graphResult.ok) {
 
         updateMomentum(
             match,
-            graphData
+            graphResult.data
         );
+    }
 
+
+    const failures =
+        resources
+            .map(
+                (resource, position) => ({
+                    resource,
+                    result: results[position]
+                })
+            )
+            .filter(
+                item => !item.result.ok
+            );
+
+
+    for (const failure of failures) {
+
+        console.error(
+            `Match ${index + 1}: ` +
+            `${failure.resource} failed ` +
+            `(${failure.result.code}): ` +
+            failure.result.message
+        );
+    }
+
+
+    if (!indicator) {
+        return;
+    }
+
+
+    if (failures.length === 0) {
 
         updateIndicator(
             match
         );
 
+        return;
     }
 
-    catch (error) {
 
-        console.error(
-            `Failed to refresh match ${index + 1}:`,
-            error
-        );
+    /*
+     * If everything failed for the same reason
+     * (e.g. unknown event, provider refusing access),
+     * say that. Otherwise list what is missing.
+     */
 
+    if (failures.length === resources.length) {
 
-        const indicator =
-            match.querySelector(
-                ".update-indicator"
+        indicator.textContent =
+            describeApiError(
+                failures[0].result
             );
 
-        if (indicator) {
-
-            indicator.textContent =
-                "Update failed";
-        }
+        return;
     }
+
+    indicator.textContent =
+        "Partial update: " +
+        failures
+            .map(
+                item => item.resource
+            )
+            .join(", ") +
+        " unavailable";
 }
 
 
@@ -1407,6 +1578,7 @@ function setupSidebarControls() {
                          */
 
                         matchState[index] = {
+                            eventId: null,
                             scoreInitialized: false,
                             homeScore: null,
                             awayScore: null

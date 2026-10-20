@@ -56,6 +56,39 @@ All optional. Nothing secret is committed.
 | `UPSTREAM_API_KEY` | _(unset)_ | If set, sent as `Authorization: Bearer <key>`. For a licensed provider. |
 | `UPSTREAM_TIMEOUT_MS` | `8000` | Per-request upstream timeout. |
 | `CACHE_TTL_SECONDS` | `10` | In-function cache and CDN `s-maxage`. `0` disables caching. |
+| `LOG_LEVEL` | `info` | `info` logs every request, `warn` logs only problems (4xx/5xx), `off` disables logs. |
+| `LOG_UPSTREAM_BODY` | on | Set to `0` to stop logging the first 300 characters of a failed upstream response. |
+
+## Logs and diagnosing a failing endpoint
+
+Each request writes one JSON line to the function logs (Vercel → project → **Logs**, or `vercel logs`). Filter by level **Error** to see upstream refusals. Example of a SofaScore refusal:
+
+```json
+{"service":"pitchboard-api","handler":"error-aware-v2","requestId":"…","resource":"event","eventId":"16363646",
+ "outcome":"error","httpStatus":502,"errorCode":"upstream_access_denied","upstreamStatus":403,
+ "upstreamUrl":"https://www.sofascore.com/api/v1/event/16363646","upstreamMs":142,
+ "upstreamHeaders":{"content-type":"application/json","server":"…"},
+ "upstreamBodySnippet":"{\"error\":{\"code\":403,\"reason\":\"Forbidden\"}}",
+ "vercelEnv":"production","region":"fra1","commit":"e6a9545"}
+```
+
+- `upstreamStatus` and `upstreamBodySnippet` show exactly what the provider answered.
+- `commit` and `vercelEnv` show which deployment handled the request.
+- Credentials are never logged: the `Authorization` header is omitted and the upstream URL is reduced to origin + path. Only an allowlist of response headers is recorded, and cookies are never included.
+
+Every response also has two headers, visible with `curl -i`:
+
+| Header | Meaning |
+|---|---|
+| `X-PitchBoard-Handler: error-aware-v2` | the new error-aware code produced this response. **If it is missing, the response came from an older deployment or from something in front of the function.** |
+| `X-Request-Id` | matches `requestId` in the logs. The browser console prints it when a request fails. |
+
+Telling the sources apart:
+
+| What you see | Meaning |
+|---|---|
+| `502` + `"code":"upstream_access_denied"` + handler header | this code ran and SofaScore refused the request |
+| `{"error":{"code":403,"reason":"Forbidden"}}` with **no** handler header | an older function forwarded the provider's body unchanged, or the block happened before the function ran |
 
 ## Data access: read this before deploying
 
